@@ -1,0 +1,12 @@
+pip install -r requirements.txtpyserial
+crcmod
+pytest
+pytest-cov
+fastapi
+uvicorn[standard]
+websockets
+requests
+
+# Optional: For auto-discovery of stations in LAN (mDNS)
+# Uncomment if you want to enable auto-discovery feature
+# zeroconf

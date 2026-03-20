@@ -447,23 +447,22 @@ docker logs -f --tail 30 dbus-logger
 curl http://localhost:8000/health
 ```
 
-### Skrypt pomocniczy – jednolinijkowy redeploy
+### Skrypt pomocniczy – redeploy.sh
+
+W repozytorium dostępny jest gotowy skrypt [redeploy.sh](redeploy.sh), który wykonuje wszystkie kroki automatycznie.
 
 ```bash
-git pull \
-  ; docker stop dbus-logger \
-  ; docker rm dbus-logger \
-  ; docker build -t dbus-logger-backend . \
-  ; docker run -d \
-      --name dbus-logger \
-      --device /dev/serial0:/dev/serial0 \
-      -p 8000:8000 \
-      -e STATION_ID=stanowisko-01 \
-      -v $(pwd)/logs:/app/logs \
-      -v $(pwd)/app_logs:/app/app_logs \
-      --restart unless-stopped \
-      dbus-logger-backend
+# Jednorazowo – nadaj uprawnienia do wykonania
+chmod +x redeploy.sh
+
+# Uruchom redeploy
+./redeploy.sh
+
+# Opcjonalnie – nadpisz Station ID
+STATION_ID=stanowisko-02 ./redeploy.sh
 ```
+
+Skrypt kolejno: pobiera zmiany (`git pull`), tworzy katalogi logów, zatrzymuje stary kontener, buduje nowy obraz i uruchamia kontener z flagą `--restart unless-stopped`.
 
 ---
 

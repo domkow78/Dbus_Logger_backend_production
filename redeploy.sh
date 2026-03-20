@@ -49,6 +49,7 @@ docker run -d \
   --device "$DEVICE:$DEVICE" \
   -p 8000:8000 \
   -e STATION_ID="$STATION_ID" \
+  -e TZ=Europe/Warsaw \
   -v "$(pwd)/logs:/app/logs" \
   -v "$(pwd)/app_logs:/app/app_logs" \
   --restart unless-stopped \

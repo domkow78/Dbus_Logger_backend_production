@@ -327,6 +327,7 @@ docker run -d \
   --device /dev/serial0:/dev/serial0 \
   -p 8000:8000 \
   -e STATION_ID=stanowisko-01 \
+  -e TZ=Europe/Warsaw \
   -v $(pwd)/logs:/app/logs \
   -v $(pwd)/app_logs:/app/app_logs \
   --restart unless-stopped \
@@ -337,6 +338,7 @@ docker run -d \
   --name dbus-logger \
   --device /dev/ttyUSB0:/dev/ttyUSB0 \
   -p 8000:8000 \
+  -e TZ=Europe/Warsaw \
   --restart unless-stopped \
   dbus-logger-backend
 ```

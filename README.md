@@ -288,6 +288,7 @@ docker run -d \
   --device /dev/serial0:/dev/serial0 \
   -p 8000:8000 \
   -e STATION_ID=stanowisko-01 \
+  -e TZ=Europe/Warsaw \
   -v $(pwd)/logs:/app/logs \
   dbus-logger-backend
 ```

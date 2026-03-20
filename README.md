@@ -285,7 +285,7 @@ docker build -t dbus-logger-backend .
 # Uruchomienie z dostępem do portu szeregowego
 docker run -d \
   --name dbus-logger \
-  --device /dev/ttyAMA0:/dev/ttyAMA0 \
+  --device /dev/serial0:/dev/serial0 \
   -p 8000:8000 \
   -e STATION_ID=stanowisko-01 \
   -v $(pwd)/logs:/app/logs \

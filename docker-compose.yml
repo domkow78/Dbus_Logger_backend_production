@@ -1,0 +1,15 @@
+services:
+  dbus-logger:
+    build: .
+    container_name: dbus-logger
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - STATION_ID=${STATION_ID:-stanowisko-01}
+      - TZ=Europe/Warsaw
+    volumes:
+      - ./logs:/app/logs
+      - ./app_logs:/app/app_logs
+    devices:
+      - /dev/serial0:/dev/serial0

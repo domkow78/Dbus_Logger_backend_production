@@ -311,36 +311,56 @@ curl http://localhost:8000/ports
 
 ## 9. Docker (opcjonalnie)
 
-Na Raspberry Pi (architektura ARM) dostępny jest Docker. Wymaga dostępu do portu szeregowego wewnątrz kontenera – konieczne jest przekazanie urządzenia.
+Na Raspberry Pi (architektura ARM) dostępny jest Docker. Projekt zawiera plik [docker-compose.yml](docker-compose.yml), który konfiguruje kontener razem z urządzeniem szeregowym, portami i wolumenami.
+
+### Pierwsze uruchomienie
 
 ```bash
 # Utwórz katalogi na logi przed pierwszym uruchomieniem
 # (Docker tworzy je automatycznie jako root – lepiej zrobić to ręcznie)
 mkdir -p logs app_logs
 
-# Budowanie obrazu
-docker build -t dbus-logger-backend .
+# Zbuduj obraz i uruchom kontener
+docker compose up -d
+```
 
-# Uruchomienie z dostępem do GPIO UART
-docker run -d \
-  --name dbus-logger \
-  --device /dev/serial0:/dev/serial0 \
-  -p 8000:8000 \
-  -e STATION_ID=stanowisko-01 \
-  -e TZ=Europe/Warsaw \
-  -v $(pwd)/logs:/app/logs \
-  -v $(pwd)/app_logs:/app/app_logs \
-  --restart unless-stopped \
-  dbus-logger-backend
+### Podstawowe komendy
 
-# Dla adaptera USB
-docker run -d \
-  --name dbus-logger \
-  --device /dev/ttyUSB0:/dev/ttyUSB0 \
-  -p 8000:8000 \
-  -e TZ=Europe/Warsaw \
-  --restart unless-stopped \
-  dbus-logger-backend
+```bash
+# Start
+docker compose up -d
+
+# Stop
+docker compose down
+
+# Restart
+docker compose restart
+
+# Logi na żywo
+docker compose logs -f
+
+# Przebuduj obraz (po zmianach w kodzie)
+docker compose build --no-cache
+docker compose up -d
+```
+
+### Nadpisanie Station ID
+
+```bash
+STATION_ID=stanowisko-02 docker compose up -d
+```
+
+Lub ustaw w pliku `.env` w katalogu projektu:
+```env
+STATION_ID=stanowisko-02
+```
+
+### Adapter USB zamiast GPIO
+
+Zmień w [docker-compose.yml](docker-compose.yml) sekcję `devices`:
+```yaml
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
 ```
 
 > ℹ️ Użytkownik wewnątrz kontenera musi należeć do grupy `dialout` lub kontener uruchamiamy z `--privileged` (niezalecane produkcyjnie).
@@ -412,38 +432,17 @@ git pull
 > ```
 > **Uwaga:** `reset --hard` **trwale usuwa** wszelkie lokalne zmiany w plikach śledzonych przez git. Pliki spoza repo (np. `logs/`, `app_logs/`) pozostają nienaruszone.
 
-### Krok 2 – zatrzymaj i usuń stary kontener
+### Krok 2 – przebuduj i uruchom przez Docker Compose
 
 ```bash
-docker stop dbus-logger
-docker rm dbus-logger
+docker compose down
+docker compose build --no-cache
+docker compose up -d
 ```
 
-### Krok 3 – przebuduj obraz
+> ℹ️ `docker compose down` zatrzymuje i usuwa kontener. `up -d` uruchamia go na nowo ze świeżo zbudowanego obrazu.
 
-```bash
-docker build -t dbus-logger-backend .
-```
-
-> ⚠️ Jeśli zmieniłeś tylko pliki Python (nie `requirements.txt` ani `Dockerfile`), można przyspieszyć build dodając `--cache-from dbus-logger-backend`.
-
-### Krok 4 – uruchom nowy kontener
-
-```bash
-docker run -d \
-  --name dbus-logger \
-  --device /dev/serial0:/dev/serial0 \
-  -p 8000:8000 \
-  -e STATION_ID=stanowisko-01 \
-  -v $(pwd)/logs:/app/logs \
-  -v $(pwd)/app_logs:/app/app_logs \
-  --restart unless-stopped \
-  dbus-logger-backend
-```
-
-> ℹ️ Flaga `--restart unless-stopped` sprawi, że kontener będzie się automatycznie wznawiał po restarcie Raspberry Pi (bez potrzeby konfigurowania systemd).
-
-### Krok 5 – zweryfikuj
+### Krok 3 – zweryfikuj
 
 ```bash
 # Sprawdź czy kontener ruszył

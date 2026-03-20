@@ -1,6 +1,4 @@
 venv/
-app_logs/
-logs/
 __pycache
 *.pyc
 

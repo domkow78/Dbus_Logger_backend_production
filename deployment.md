@@ -314,6 +314,10 @@ curl http://localhost:8000/ports
 Na Raspberry Pi (architektura ARM) dostępny jest Docker. Wymaga dostępu do portu szeregowego wewnątrz kontenera – konieczne jest przekazanie urządzenia.
 
 ```bash
+# Utwórz katalogi na logi przed pierwszym uruchomieniem
+# (Docker tworzy je automatycznie jako root – lepiej zrobić to ręcznie)
+mkdir -p logs app_logs
+
 # Budowanie obrazu
 docker build -t dbus-logger-backend .
 
@@ -325,6 +329,7 @@ docker run -d \
   -e STATION_ID=stanowisko-01 \
   -v $(pwd)/logs:/app/logs \
   -v $(pwd)/app_logs:/app/app_logs \
+  --restart unless-stopped \
   dbus-logger-backend
 
 # Dla adaptera USB
@@ -332,6 +337,7 @@ docker run -d \
   --name dbus-logger \
   --device /dev/ttyUSB0:/dev/ttyUSB0 \
   -p 8000:8000 \
+  --restart unless-stopped \
   dbus-logger-backend
 ```
 

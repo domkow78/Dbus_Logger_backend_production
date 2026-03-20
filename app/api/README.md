@@ -141,7 +141,7 @@ Funkcja inicjalizująca wszystkie komponenty UART i ApplicationService.
 1. **Utworzenie SerialPort**
    ```python
    port = SerialPort(
-       port=config.DEFAULT_PORT,      # np. COM5 / /dev/ttyAMA0
+       port=config.DEFAULT_PORT,      # np. COM5 / /dev/serial0
        baudrate=config.DEFAULT_BAUDRATE,
        parity=config.get_parity_constant(config.DEFAULT_PARITY),
        stopbits=config.DEFAULT_STOPBITS,
@@ -326,7 +326,7 @@ Zwraca JSON z metadanymi API.
   "hostname": "raspberry-pi-lab-01",
   "ip_address": "192.168.1.10",
   "uart": {
-    "port": "/dev/ttyAMA0",
+    "port": "/dev/serial0",
     "connected": true,
     "baudrate": 9600
   },
@@ -887,7 +887,7 @@ API korzysta z ustawień z [core/config.py](../core/config.py):
 
 ```python
 # Port UART
-config.DEFAULT_PORT          # COM5 / /dev/ttyAMA0
+config.DEFAULT_PORT          # COM5 / /dev/serial0
 config.DEFAULT_BAUDRATE      # 9600
 
 # Katalogi

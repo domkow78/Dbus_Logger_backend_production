@@ -56,7 +56,7 @@ PC Operatora
 ## Wymagania
 
 - Python **3.10+**
-- Dostęp do portu szeregowego (GPIO UART `/dev/ttyAMA0` lub adapter USB, `COM5`)
+- Dostęp do portu szeregowego (GPIO UART `/dev/serial0` → `ttyAMA0` lub adapter USB, `COM5`)
 - Raspberry Pi OS (Linux) lub Windows 10/11
 
 ---
@@ -97,7 +97,7 @@ Wszystkie parametry znajdują się w [app/core/config.py](app/core/config.py).
 
 | System   | Domyślny port   | Alternatywy                              |
 |----------|-----------------|------------------------------------------|
-| Linux    | `/dev/ttyAMA0`  | `/dev/ttyUSB0`, `/dev/ttyUSB1`, `/dev/serial0` |
+| Linux    | `/dev/serial0`  | `/dev/ttyAMA0`, `/dev/ttyUSB0`, `/dev/ttyUSB1` |
 | Windows  | `COM5`          | `COM1`, `COM3`, `COM4`                   |
 
 Port jest wykrywany automatycznie na podstawie systemu operacyjnego.
@@ -204,7 +204,7 @@ curl http://192.168.1.42:8000/health
   "hostname": "raspberrypi",
   "ip_address": "192.168.1.42",
   "uart": {
-    "port": "/dev/ttyAMA0",
+    "port": "/dev/serial0",
     "connected": true,
     "baudrate": 9600,
     "reconnect_enabled": true,

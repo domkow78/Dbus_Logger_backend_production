@@ -94,7 +94,7 @@ CURRENT_OS = detect_os()
 # Domyślne porty szeregowe dla różnych systemów
 DEFAULT_PORTS = {
     'windows': 'COM5',
-    'linux': '/dev/ttyAMA0',      # Raspberry Pi hardware UART (GPIO 14/15, BT wyłączony)
+    'linux': '/dev/serial0',      # Raspberry Pi hardware UART (symlink → ttyAMA0, BT wyłączony)
     'unknown': 'COM1'
 }
 
@@ -105,11 +105,10 @@ DEFAULT_PORT = DEFAULT_PORTS.get(CURRENT_OS, 'COM1')
 COMMON_PORTS = {
     'windows': ['COM1', 'COM3', 'COM4', 'COM5'],
     'linux': [
+        '/dev/serial0',    # Raspberry Pi symlink (primary UART, działa też w Docker)
+        '/dev/ttyAMA0',    # Raspberry Pi hardware UART
         '/dev/ttyUSB0',    # USB-UART adapter
         '/dev/ttyUSB1',
-        '/dev/ttyAMA0',    # Raspberry Pi hardware UART
-        '/dev/ttyS0',      # Standard serial port
-        '/dev/serial0',    # Raspberry Pi symlink
     ],
     'unknown': ['COM1']
 }

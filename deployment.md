@@ -15,8 +15,10 @@ Instrukcja wdrożenia backendu Dbus Logger na Raspberry Pi OS (Bullseye / Bookwo
 7. [Usługa systemd – autostart przy starcie systemu](#7-usługa-systemd--autostart-przy-starcie-systemu)
 8. [Weryfikacja działania](#8-weryfikacja-działania)
 9. [Docker (opcjonalnie)](#9-docker-opcjonalnie)
-10. [Firewall / sieć](#10-firewall--sieć)
-11. [Rozwiązywanie problemów](#11-rozwiązywanie-problemów)
+10. [Logi kontenera Docker](#10-logi-kontenera-docker)
+11. [Aktualizacja po zmianach w repo](#11-aktualizacja-po-zmianach-w-repo)
+12. [Firewall / sieć](#12-firewall--sieć)
+13. [Rozwiązywanie problemów](#13-rozwiązywanie-problemów)
 
 ---
 
@@ -166,7 +168,15 @@ pip install zeroconf
 
 Otwórz plik [app/core/config.py](app/core/config.py) i upewnij się, że domyślny port dla Linuxa wskazuje na właściwy port.
 
-Jeśli używasz **GPIO UART (ttyAMA0)**:
+Jeśli używasz **GPIO UART przez symlink `/dev/serial0`** (zalecane):
+```python
+DEFAULT_PORTS = {
+    'linux': '/dev/serial0',   # ← symlink Pi OS → ttyAMA0 (stabilny, działa również w Docker)
+    ...
+}
+```
+
+Jeśli chcesz użyć **ttyAMA0 bezpośrednio**:
 ```python
 DEFAULT_PORTS = {
     'linux': '/dev/ttyAMA0',   # ← hardware UART na GPIO 14/15
@@ -329,7 +339,129 @@ docker run -d \
 
 ---
 
-## 10. Firewall / sieć
+## 10. Logi kontenera Docker
+
+### Logi na żywo
+
+```bash
+# Podgląd logów działającego kontenera (na żywo)
+docker logs -f dbus-logger
+
+# Ostatnie 100 linii
+docker logs --tail 100 dbus-logger
+
+# Ostatnie 100 linii + na żywo
+docker logs --tail 100 -f dbus-logger
+
+# Z timestampami
+docker logs -f --timestamps dbus-logger
+```
+
+### Status i inspekcja kontenera
+
+```bash
+# Czy kontener działa?
+docker ps
+docker ps -a          # także zatrzymane
+
+# Szczegółowe informacje (IP, zmienne środowiskowe, urządzenia)
+docker inspect dbus-logger
+
+# Zużycie zasobów
+docker stats dbus-logger
+```
+
+### Wejście do kontenera (debugging)
+
+```bash
+# Powłoka bash wewnątrz działającego kontenera
+docker exec -it dbus-logger bash
+
+# Sprawdzenie dostępnych urządzeń szeregowych wewnątrz kontenera
+docker exec dbus-logger ls -la /dev/serial* /dev/ttyAMA* /dev/ttyUSB* 2>/dev/null
+
+# Sprawdzenie health check bezpośrednio z wnątrza
+docker exec dbus-logger curl -s http://localhost:8000/health
+```
+
+---
+
+## 11. Aktualizacja po zmianach w repo
+
+Przebieg po każdym `git pull` lub ręcznej edycji plików:
+
+### Krok 1 – pobierz zmiany
+
+```bash
+cd ~/Dbus_Logger_backend_production
+git pull
+```
+
+### Krok 2 – zatrzymaj i usuń stary kontener
+
+```bash
+docker stop dbus-logger
+docker rm dbus-logger
+```
+
+### Krok 3 – przebuduj obraz
+
+```bash
+docker build -t dbus-logger-backend .
+```
+
+> ⚠️ Jeśli zmieniłeś tylko pliki Python (nie `requirements.txt` ani `Dockerfile`), można przyspieszyć build dodając `--cache-from dbus-logger-backend`.
+
+### Krok 4 – uruchom nowy kontener
+
+```bash
+docker run -d \
+  --name dbus-logger \
+  --device /dev/serial0:/dev/serial0 \
+  -p 8000:8000 \
+  -e STATION_ID=stanowisko-01 \
+  -v $(pwd)/logs:/app/logs \
+  -v $(pwd)/app_logs:/app/app_logs \
+  --restart unless-stopped \
+  dbus-logger-backend
+```
+
+> ℹ️ Flaga `--restart unless-stopped` sprawi, że kontener będzie się automatycznie wznawiał po restarcie Raspberry Pi (bez potrzeby konfigurowania systemd).
+
+### Krok 5 – zweryfikuj
+
+```bash
+# Sprawdź czy kontener ruszył
+docker ps
+
+# Obserwuj logi startu
+docker logs -f --tail 30 dbus-logger
+
+# Health check
+curl http://localhost:8000/health
+```
+
+### Skrypt pomocniczy – jednolinijkowy redeploy
+
+```bash
+git pull \
+  ; docker stop dbus-logger \
+  ; docker rm dbus-logger \
+  ; docker build -t dbus-logger-backend . \
+  ; docker run -d \
+      --name dbus-logger \
+      --device /dev/serial0:/dev/serial0 \
+      -p 8000:8000 \
+      -e STATION_ID=stanowisko-01 \
+      -v $(pwd)/logs:/app/logs \
+      -v $(pwd)/app_logs:/app/app_logs \
+      --restart unless-stopped \
+      dbus-logger-backend
+```
+
+---
+
+## 12. Firewall / sieć
 
 Upewnij się, że port `8000` jest dostępny w sieci LAN:
 
@@ -346,7 +478,7 @@ Backend nasłuchuje na `0.0.0.0:8000` – dostępny ze wszystkich interfejsów s
 
 ---
 
-## 11. Rozwiązywanie problemów
+## 13. Rozwiązywanie problemów
 
 ### Port `/dev/ttyAMA0` nie istnieje lub niedostępny
 

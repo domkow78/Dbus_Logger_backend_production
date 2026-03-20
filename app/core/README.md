@@ -99,7 +99,7 @@ DEFAULT_TIMEOUT = 1.0   # sekundy
 
 **Auto-detekcja systemu:**
 - Windows: `COM5` (domyślnie)
-- Linux: `/dev/ttyAMA0` (domyślnie – GPIO UART, BT wyłączony)
+- Linux: `/dev/serial0` (domyślnie – symlink Pi OS → ttyAMA0, BT wyłączony)
 
 ### Funkcje pomocnicze
 
@@ -143,7 +143,7 @@ Rozszerzona klasa `serial.Serial` z logowaniem i obsługą błędów.
 **Konstruktor:**
 ```python
 SerialPort(
-    port,                          # 'COM3' lub '/dev/ttyAMA0'
+    port,                          # 'COM3' lub '/dev/serial0'
     baudrate=9600,
     bytesize=8,
     parity=serial.PARITY_NONE,
@@ -807,7 +807,7 @@ INTERRUPTION_TIMEOUT = 10.0  # 10 sekund zamiast 5
 ```python
 DEFAULT_PORT = 'COM3'  # Windows
 # lub
-DEFAULT_PORT = '/dev/ttyAMA0'  # Raspberry Pi hardware UART
+DEFAULT_PORT = '/dev/serial0'  # Raspberry Pi – symlink → ttyAMA0
 ```
 
 ### Zmiana baudrate

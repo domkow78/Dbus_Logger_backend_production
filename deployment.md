@@ -405,6 +405,13 @@ cd ~/Dbus_Logger_backend_production
 git pull
 ```
 
+> ⚠️ Jeśli `git pull` zgłasza konflikty lub błąd (np. `Your local changes would be overwritten`), użyj:
+> ```bash
+> git fetch origin
+> git reset --hard origin/main
+> ```
+> **Uwaga:** `reset --hard` **trwale usuwa** wszelkie lokalne zmiany w plikach śledzonych przez git. Pliki spoza repo (np. `logs/`, `app_logs/`) pozostają nienaruszone.
+
 ### Krok 2 – zatrzymaj i usuń stary kontener
 
 ```bash
@@ -486,6 +493,24 @@ Backend nasłuchuje na `0.0.0.0:8000` – dostępny ze wszystkich interfejsów s
 ---
 
 ## 13. Rozwiązywanie problemów
+
+### `git pull` zgłasza konflikty lub błąd
+
+Na Raspberry Pi pliki mogą różnić się od repozytorium (np. przez ręczne edycje). Aby wymuścić nadpisanie lokalnych zmian wersją z remote:
+
+```bash
+# Pobierz aktualny stan remote bez scalania
+git fetch origin
+
+# Wymuś nadpisanie lokalnych plików (nieodwracalne!)
+git reset --hard origin/main
+```
+
+Sprawdź jakie zmiany są lokalnie przed resetem:
+```bash
+git status
+git diff
+```
 
 ### Port `/dev/ttyAMA0` nie istnieje lub niedostępny
 

@@ -99,7 +99,7 @@ DEFAULT_TIMEOUT = 1.0   # sekundy
 
 **Auto-detekcja systemu:**
 - Windows: `COM5` (domyślnie)
-- Linux: `/dev/ttyUSB0` (domyślnie)
+- Linux: `/dev/ttyAMA0` (domyślnie – GPIO UART, BT wyłączony)
 
 ### Funkcje pomocnicze
 
@@ -143,7 +143,7 @@ Rozszerzona klasa `serial.Serial` z logowaniem i obsługą błędów.
 **Konstruktor:**
 ```python
 SerialPort(
-    port,                          # 'COM3' lub '/dev/ttyUSB0'
+    port,                          # 'COM3' lub '/dev/ttyAMA0'
     baudrate=9600,
     bytesize=8,
     parity=serial.PARITY_NONE,

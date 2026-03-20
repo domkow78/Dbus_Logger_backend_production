@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-UART Logger - Backend Entry Point
+Dbus Logger - Backend Entry Point
 Uruchamia FastAPI + ApplicationService + UART na Raspberry Pi.
 
 Przeznaczony do uruchomienia na stanowiskach w sieci LAN.
@@ -44,7 +44,7 @@ def register_mdns_service():
         
         # Informacje o usłudze
         station_id = os.getenv("STATION_ID", socket.gethostname())
-        service_type = "_uart-logger._tcp.local."
+        service_type = "_dbus-logger._tcp.local."
         service_name = f"{station_id}.{service_type}"
         
         # Rejestracja
@@ -79,7 +79,7 @@ def print_banner():
     local_ip = get_local_ip()
     
     print("\n" + "="*70)
-    print("🚀 UART LOGGER - BACKEND")
+    print("🚀 DBUS LOGGER - BACKEND")
     print("="*70)
     print(f"Station ID:       {station_id}")
     print(f"Hostname:         {socket.gethostname()}")

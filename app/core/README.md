@@ -1,4 +1,4 @@
-# Core Module - UART Logger
+# Core Module - Dbus Logger
 
 ## 📋 Przegląd
 
@@ -48,7 +48,7 @@ def get_local_ip() -> str:
 
 **Zastosowanie:**
 - `GET /health` endpoint - zwraca `station_id` i `ip_address`
-- mDNS auto-discovery - publikuje usługę `{station_id}._uart-logger._tcp.local.`
+- mDNS auto-discovery - publikuje usługę `{station_id}._dbus-logger._tcp.local.`
 - Identyfikacja wielu Raspberry Pi w sieci LAN
 
 **Konfiguracja:**
@@ -856,7 +856,7 @@ print(f"Last activity: {elapsed:.2f}s ago")
 
 ## 📝 Licencja i autorzy
 
-Moduł napisany dla projektu UART Logger - Dbus_Logger.
+Moduł napisany dla projektu Dbus Logger - Dbus_Logger.
 
 **Data utworzenia:** 2026-02  
 **Język:** Python 3.8+  

@@ -1,6 +1,6 @@
 # Deployment – Raspberry Pi
 
-Instrukcja wdrożenia backendu UART Logger na Raspberry Pi OS (Bullseye / Bookworm).
+Instrukcja wdrożenia backendu Dbus Logger na Raspberry Pi OS (Bullseye / Bookworm).
 
 ---
 
@@ -208,7 +208,7 @@ python start_backend.py
 Backend powinien uruchomić się na porcie **8000**:
 ```
 ======================================================================
-🚀 UART LOGGER - BACKEND
+🚀 DBUS LOGGER - BACKEND
 ======================================================================
 Station ID:       raspberrypi
 Local IP:         192.168.x.x
@@ -229,14 +229,14 @@ Zatrzymaj: `Ctrl+C`
 Utwórz plik serwisu:
 
 ```bash
-sudo nano /etc/systemd/system/uart-logger-backend.service
+sudo nano /etc/systemd/system/dbus-logger-backend.service
 ```
 
 Wklej poniższą konfigurację (dostosuj ścieżki i użytkownika):
 
 ```ini
 [Unit]
-Description=UART Logger Backend
+Description=Dbus Logger Backend
 After=network.target
 Wants=network-online.target
 
@@ -268,18 +268,18 @@ Załaduj i włącz serwis:
 sudo systemctl daemon-reload
 
 # Włącz autostart
-sudo systemctl enable uart-logger-backend.service
+sudo systemctl enable dbus-logger-backend.service
 
 # Uruchom serwis
-sudo systemctl start uart-logger-backend.service
+sudo systemctl start dbus-logger-backend.service
 
 # Sprawdź status
-sudo systemctl status uart-logger-backend.service
+sudo systemctl status dbus-logger-backend.service
 ```
 
 Podgląd logów na żywo:
 ```bash
-journalctl -u uart-logger-backend.service -f
+journalctl -u dbus-logger-backend.service -f
 ```
 
 ---
@@ -305,24 +305,24 @@ Na Raspberry Pi (architektura ARM) dostępny jest Docker. Wymaga dostępu do por
 
 ```bash
 # Budowanie obrazu
-docker build -t uart-logger-backend .
+docker build -t dbus-logger-backend .
 
 # Uruchomienie z dostępem do GPIO UART
 docker run -d \
-  --name uart-logger \
+  --name dbus-logger \
   --device /dev/ttyAMA0:/dev/ttyAMA0 \
   -p 8000:8000 \
   -e STATION_ID=stanowisko-01 \
   -v $(pwd)/logs:/app/logs \
   -v $(pwd)/app_logs:/app/app_logs \
-  uart-logger-backend
+  dbus-logger-backend
 
 # Dla adaptera USB
 docker run -d \
-  --name uart-logger \
+  --name dbus-logger \
   --device /dev/ttyUSB0:/dev/ttyUSB0 \
   -p 8000:8000 \
-  uart-logger-backend
+  dbus-logger-backend
 ```
 
 > ℹ️ Użytkownik wewnątrz kontenera musi należeć do grupy `dialout` lub kontener uruchamiamy z `--privileged` (niezalecane produkcyjnie).

@@ -1,5 +1,5 @@
 """
-UART Logger - Main Application
+Dbus Logger - Main Application
 Łączy core logic (ApplicationService) z REST API (FastAPI)
 """
 
@@ -62,7 +62,7 @@ def initialize_uart_and_service():
         RuntimeError: Jeśli nie można otworzyć portu
     """
     logger.info("="*70)
-    logger.info("INICJALIZACJA UART LOGGER")
+    logger.info("INICJALIZACJA DBUS LOGGER")
     logger.info("="*70)
     
     logger.info(f"System: {config.CURRENT_OS.upper()}")
@@ -181,8 +181,8 @@ async def lifespan(app: FastAPI):
 # =============================================================================
 
 app = FastAPI(
-    title="UART Logger API",
-    description="REST API dla aplikacji do logowania komunikacji UART z detekcją cykli",
+    title="Dbus Logger API",
+    description="REST API dla aplikacji do logowania komunikacji Dbus z detekcją cykli",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -209,7 +209,7 @@ async def root():
     return """
     <html>
         <head>
-            <title>UART Logger API</title>
+            <title>Dbus Logger API</title>
             <style>
                 body { 
                     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -273,7 +273,7 @@ async def root():
         </head>
         <body>
             <div class="container">
-                <h1>🔌 UART Logger API</h1>
+                <h1>🔌 Dbus Logger API</h1>
                 <p><strong>Version:</strong> 1.0.0</p>
                 <p><strong>Status:</strong> <span class="status">✓ Running</span></p>
                 
@@ -313,10 +313,10 @@ async def api_info():
     API Information endpoint (JSON)
     """
     return {
-        "name": "UART Logger API",
+        "name": "Dbus Logger API",
         "version": "1.0.0",
         "status": "running",
-        "description": "REST API dla monitoringu i kontroli aplikacji UART Logger",
+        "description": "REST API dla monitoringu i kontroli aplikacji Dbus Logger",
         "gui": {
             "type": "NiceGUI",
             "note": "Run separately: python gui_nicegui.py (port 8080)"
@@ -666,7 +666,7 @@ if __name__ == "__main__":
     import uvicorn
     
     print("\n" + "="*70)
-    print("UART LOGGER - Production API")
+    print("DBUS LOGGER - Production API")
     print("="*70)
     print(f"API będzie dostępne na: http://localhost:8000")
     print(f"Dokumentacja API: http://localhost:8000/docs")

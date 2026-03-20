@@ -1,4 +1,4 @@
-# UART Logger – Backend (Production)
+# Dbus Logger – Backend (Production)
 
 REST API backend do monitorowania i logowania komunikacji UART z automatyczną detekcją cykli. Zaprojektowany do uruchomienia na **Raspberry Pi** lub stacji roboczej w sieci LAN. Komunikuje się z dedykowanym frontendem (NiceGUI) przez HTTP.
 
@@ -147,7 +147,7 @@ Przy starcie wyświetlany jest banner z adresem IP stanowiska:
 
 ```
 ======================================================================
-🚀 UART LOGGER - BACKEND
+🚀 DBUS LOGGER - BACKEND
 ======================================================================
 Station ID:       raspberry-01
 Hostname:         raspberrypi
@@ -280,16 +280,16 @@ Logi procesu backendu (rotacja dzienna, retencja: 1 dzień).
 
 ```bash
 # Budowanie obrazu
-docker build -t uart-logger-backend .
+docker build -t dbus-logger-backend .
 
 # Uruchomienie z dostępem do portu szeregowego
 docker run -d \
-  --name uart-logger \
+  --name dbus-logger \
   --device /dev/ttyAMA0:/dev/ttyAMA0 \
   -p 8000:8000 \
   -e STATION_ID=stanowisko-01 \
   -v $(pwd)/logs:/app/logs \
-  uart-logger-backend
+  dbus-logger-backend
 ```
 
 ---

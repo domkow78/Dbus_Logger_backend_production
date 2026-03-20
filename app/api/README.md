@@ -1,8 +1,8 @@
-# API Module - UART Logger
+# API Module - Dbus Logger
 
 ## 📋 Przegląd
 
-Moduł `api` dostarcza REST API dla aplikacji UART Logger, wykorzystując framework FastAPI. Łączy funkcjonalności z modułu [core](../core/) z interfejsem HTTP, umożliwiając zdalne monitorowanie i kontrolę logowania komunikacji UART.
+Moduł `api` dostarcza REST API dla aplikacji Dbus Logger, wykorzystując framework FastAPI. Łączy funkcjonalności z modułu [core](../core/) z interfejsem HTTP, umożliwiając zdalne monitorowanie i kontrolę logowania komunikacji Dbus.
 
 **Architektura:** Backend działa jako **samodzielny proces** (niezależnie od GUI), idealny do uruchomienia na Raspberry Pi w sieci LAN.
 
@@ -244,7 +244,7 @@ async def lifespan(app: FastAPI):
 
 ```python
 app = FastAPI(
-    title="UART Logger API",
+    title="Dbus Logger API",
     description="REST API dla aplikacji do logowania komunikacji UART z detekcją cykli",
     version="1.0.0",
     lifespan=lifespan
@@ -292,10 +292,10 @@ Zwraca JSON z metadanymi API.
 **Odpowiedź:**
 ```json
 {
-  "name": "UART Logger API",
+  "name": "Dbus Logger API",
   "version": "1.0.0",
   "status": "running",
-  "description": "REST API dla monitoringu i kontroli aplikacji UART Logger",
+  "description": "REST API dla monitoringu i kontroli aplikacji Dbus Logger",
   "gui": {
     "type": "NiceGUI",
     "note": "Run separately: python start_frontend.py (port 8080)"
@@ -383,7 +383,7 @@ done
 
 ### 📊 `GET /status` - Status aplikacji
 
-Zwraca aktualny status aplikacji UART Logger.
+Zwraca aktualny status aplikacji Dbus Logger.
 
 **Odpowiedź:**
 ```json
@@ -691,7 +691,7 @@ logging.basicConfig(
 **Startup:**
 ```
 2026-02-17 11:29:15.123 - __main__ - INFO - ==============================
-2026-02-17 11:29:15.124 - __main__ - INFO - INICJALIZACJA UART LOGGER
+2026-02-17 11:29:15.124 - __main__ - INFO - INICJALIZACJA DBUS LOGGER
 2026-02-17 11:29:15.125 - __main__ - INFO - System: WINDOWS
 2026-02-17 11:29:15.126 - __main__ - INFO - Port: COM5
 2026-02-17 11:29:15.127 - my_project.core.uart - INFO - Serial port COM5 initialized
@@ -1109,7 +1109,7 @@ pip install fastapi uvicorn pydantic pyserial crcmod
 
 ## 📝 Licencja i autorzy
 
-Moduł napisany dla projektu UART Logger - Dbus_Logger.
+Moduł napisany dla projektu Dbus Logger - Dbus_Logger.
 
 **Data utworzenia:** 2026-02  
 **Framework:** FastAPI  

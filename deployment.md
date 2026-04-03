@@ -313,7 +313,56 @@ curl http://localhost:8000/ports
 
 Na Raspberry Pi (architektura ARM) dostępny jest Docker. Projekt zawiera plik [docker-compose.yml](docker-compose.yml), który konfiguruje kontener razem z urządzeniem szeregowym, portami i wolumenami.
 
-### Pierwsze uruchomienie
+### 9.1 Instalacja Dockera na Raspberry Pi
+
+Zalecana metoda to oficjalny skrypt instalacyjny Docker Inc., który obsługuje architekturę ARM (armv7l / aarch64):
+
+```bash
+# Zaktualizuj listę pakietów
+sudo apt update && sudo apt upgrade -y
+
+# Pobierz i uruchom oficjalny skrypt instalacyjny
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+```
+
+Po instalacji dodaj bieżącego użytkownika do grupy `docker`, aby nie musieć używać `sudo` przy każdej komendzie:
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+> ⚠️ Wyloguj się i zaloguj ponownie (lub uruchom `newgrp docker`), aby zmiany weszły w życie.
+
+Włącz Docker jako usługę systemową (autostart po restarcie):
+
+```bash
+sudo systemctl enable docker
+sudo systemctl start docker
+```
+
+Zainstaluj Docker Compose (plugin):
+
+```bash
+sudo apt install -y docker-compose-plugin
+```
+
+Weryfikacja instalacji:
+
+```bash
+# Wersja Dockera
+docker --version
+
+# Wersja Docker Compose
+docker compose version
+
+# Test działania (powinien pobrać i uruchomić kontener hello-world)
+docker run --rm hello-world
+```
+
+---
+
+### 9.2 Pierwsze uruchomienie
 
 ```bash
 # Utwórz katalogi na logi przed pierwszym uruchomieniem
@@ -324,7 +373,7 @@ mkdir -p logs app_logs
 docker compose up -d
 ```
 
-### Podstawowe komendy
+### 9.3 Podstawowe komendy
 
 ```bash
 # Start
@@ -344,7 +393,7 @@ docker compose build --no-cache
 docker compose up -d
 ```
 
-### Nadpisanie Station ID
+### 9.4 Nadpisanie Station ID
 
 ```bash
 STATION_ID=stanowisko-02 docker compose up -d
@@ -355,7 +404,7 @@ Lub ustaw w pliku `.env` w katalogu projektu:
 STATION_ID=stanowisko-02
 ```
 
-### Adapter USB zamiast GPIO
+### 9.5 Adapter USB zamiast GPIO
 
 Zmień w [docker-compose.yml](docker-compose.yml) sekcję `devices`:
 ```yaml

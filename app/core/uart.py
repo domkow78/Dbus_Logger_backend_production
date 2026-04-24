@@ -343,9 +343,7 @@ class UARTHandler:
         logger.debug(f"Decoding transaction: {buf.hex().upper()}")
 
         while buf:
-            # -------------------------------------------------
             # 1. FRAME (check if current byte could be LEN)
-            # -------------------------------------------------
             if len(buf) < 1:
                 break
 
@@ -384,19 +382,17 @@ class UARTHandler:
                 if crc_received != crc_calculated:
                     logger.error(
                         f"CRC FAIL for frame: {frame.hex().upper()}. "
-                        f"Skipping byte and continuing..."
+                        f"Skipping {frame_len} bytes and continuing..."
                     )
-                    # Don't break - skip this byte and try to find next frame
-                    buf.pop(0)
+                    # Przesuń bufor o długość ramki, by nie próbować dekodować środka ramki
+                    del buf[:frame_len]
                     continue
 
                 logger.info(f"Frame OK: {frame.hex().upper()}")
                 events.append(frame)
                 del buf[:frame_len]
 
-                # -------------------------------------------------
                 # 2. ACK (ONLY immediately after a FRAME)
-                # -------------------------------------------------
                 if buf:
                     ack = AckType.from_byte(buf[0])
                     if ack:
@@ -406,9 +402,7 @@ class UARTHandler:
 
                 continue
 
-            # -------------------------------------------------
             # 3. INVALID BYTE (not a valid LEN)
-            # -------------------------------------------------
             logger.warning(
                 f"Invalid LEN byte 0x{buf[0]:02X} in transaction, skipping"
             )

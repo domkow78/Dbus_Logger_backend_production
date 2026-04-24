@@ -1,4 +1,4 @@
-# Core Module - Dbus Logger
+# Core Module - UART Logger
 
 ## 📋 Przegląd
 
@@ -48,7 +48,7 @@ def get_local_ip() -> str:
 
 **Zastosowanie:**
 - `GET /health` endpoint - zwraca `station_id` i `ip_address`
-- mDNS auto-discovery - publikuje usługę `{station_id}._dbus-logger._tcp.local.`
+- mDNS auto-discovery - publikuje usługę `{station_id}._uart-logger._tcp.local.`
 - Identyfikacja wielu Raspberry Pi w sieci LAN
 
 **Konfiguracja:**
@@ -99,7 +99,7 @@ DEFAULT_TIMEOUT = 1.0   # sekundy
 
 **Auto-detekcja systemu:**
 - Windows: `COM5` (domyślnie)
-- Linux: `/dev/serial0` (domyślnie – symlink Pi OS → ttyAMA0, BT wyłączony)
+- Linux: `/dev/ttyUSB0` (domyślnie)
 
 ### Funkcje pomocnicze
 
@@ -143,7 +143,7 @@ Rozszerzona klasa `serial.Serial` z logowaniem i obsługą błędów.
 **Konstruktor:**
 ```python
 SerialPort(
-    port,                          # 'COM3' lub '/dev/serial0'
+    port,                          # 'COM3' lub '/dev/ttyUSB0'
     baudrate=9600,
     bytesize=8,
     parity=serial.PARITY_NONE,
@@ -291,8 +291,11 @@ for event in events:
 1. Transakcja ZAWSZE zaczyna się od ramki (LEN byte)
 2. ACK może wystąpić TYLKO po prawidłowej ramce
 3. CRC jest obliczane z: `LEN + ADDR + CMD + DATA`
-4. Błędny CRC → cała transakcja odrzucona
+4. Błędny CRC → bufor przesuwany o długość ramki (nie tylko 1 bajt), co minimalizuje zalew błędów przy sklejonych ramkach
 5. Brak sliding-window resync wewnątrz transakcji
+
+**Nowość 2026-04:**
+- Po wykryciu błędu CRC parser przesuwa bufor o długość ramki, co zapobiega powielaniu błędów i ostrzeżeń przy sklejonych ramkach (poprawka synchronizacji dekodera)
 
 ---
 
@@ -807,7 +810,7 @@ INTERRUPTION_TIMEOUT = 10.0  # 10 sekund zamiast 5
 ```python
 DEFAULT_PORT = 'COM3'  # Windows
 # lub
-DEFAULT_PORT = '/dev/serial0'  # Raspberry Pi – symlink → ttyAMA0
+DEFAULT_PORT = '/dev/ttyAMA0'  # Raspberry Pi hardware UART
 ```
 
 ### Zmiana baudrate
@@ -856,7 +859,7 @@ print(f"Last activity: {elapsed:.2f}s ago")
 
 ## 📝 Licencja i autorzy
 
-Moduł napisany dla projektu Dbus Logger - Dbus_Logger.
+Moduł napisany dla projektu UART Logger - Dbus_Logger.
 
 **Data utworzenia:** 2026-02  
 **Język:** Python 3.8+  

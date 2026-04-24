@@ -292,7 +292,8 @@ for event in events:
 2. ACK może wystąpić TYLKO po prawidłowej ramce
 3. CRC jest obliczane z: `LEN + ADDR + CMD + DATA`
 4. Błędny CRC → bufor przesuwany o długość ramki (nie tylko 1 bajt), co minimalizuje zalew błędów przy sklejonych ramkach
-5. Brak sliding-window resync wewnątrz transakcji
+5. Jeśli cała transakcja to blok identycznych ramek (np. 5x ta sama ramka, bez ACK, rozdzielone idle gapem), dekoder automatycznie rozbija blok na osobne zdarzenia (każda ramka jako osobny event). CRC sprawdzane jest tylko dla pierwszej ramki bloku.
+6. Brak sliding-window resync wewnątrz transakcji
 
 **Nowość 2026-04:**
 - Po wykryciu błędu CRC parser przesuwa bufor o długość ramki, co zapobiega powielaniu błędów i ostrzeżeń przy sklejonych ramkach (poprawka synchronizacji dekodera)

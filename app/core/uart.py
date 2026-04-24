@@ -353,6 +353,36 @@ class UARTHandler:
             if 2 <= length <= 64:
                 frame_len = 1 + 1 + length + 2  # LEN + ADDR + CMD+DATA + CRC
 
+                # --- Nowość: rozbijanie bloku identycznych ramek bez ACK ---
+                # Jeśli długość bufora to wielokrotność frame_len i wszystkie ramki są identyczne, rozbij blok
+                if len(buf) >= 2 * frame_len and len(buf) % frame_len == 0:
+                    first_frame = bytes(buf[:frame_len])
+                    all_identical = True
+                    for i in range(1, len(buf) // frame_len):
+                        next_frame = bytes(buf[i*frame_len:(i+1)*frame_len])
+                        if next_frame != first_frame:
+                            all_identical = False
+                            break
+                    if all_identical:
+                        # Sprawdź CRC tylko pierwszej ramki
+                        crc_received = first_frame[-2:]
+                        crc_calculated = CRC16XModem.calculate(
+                            first_frame[:-2]
+                        ).to_bytes(2, byteorder="big")
+                        if crc_received == crc_calculated:
+                            for i in range(len(buf) // frame_len):
+                                logger.info(f"Frame OK: {first_frame.hex().upper()} (identical block)")
+                                events.append(first_frame)
+                            buf.clear()
+                            break
+                        else:
+                            logger.error(
+                                f"CRC FAIL for frame: {first_frame.hex().upper()} (identical block). "
+                                f"Skipping {len(buf)} bytes and continuing..."
+                            )
+                            buf.clear()
+                            break
+
                 # Check if we have enough bytes for complete frame
                 if len(buf) < frame_len:
                     logger.warning(

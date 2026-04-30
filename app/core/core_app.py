@@ -174,6 +174,25 @@ class LogManager:
         # Utwórz katalog jeśli nie istnieje
         os.makedirs(self.logs_dir, exist_ok=True)
 
+        # Wyczyść stare logi cykli
+        self._cleanup_old_cycle_logs()
+        
+    def _cleanup_old_cycle_logs(self):
+        """
+        Usuwa pliki logów cykli starsze niż LOGS_RETENTION_DAYS.
+        """
+        try:
+            cutoff_date = datetime.now() - timedelta(days=config.LOGS_RETENTION_DAYS)
+            for filename in os.listdir(self.logs_dir):
+                if filename.startswith("cycle_") and filename.endswith(".txt"):
+                    filepath = os.path.join(self.logs_dir, filename)
+                    file_time = datetime.fromtimestamp(os.path.getmtime(filepath))
+                    if file_time < cutoff_date:
+                        os.remove(filepath)
+                        logger.info(f"Deleted old cycle log: {filename}")
+        except Exception as e:
+            logger.error(f"Error cleaning up old cycle logs: {e}")
+
     def start_new_log(self, cycle_number: int, timestamp: datetime) -> str:
         """
         Tworzy nowy plik logu dla cyklu.

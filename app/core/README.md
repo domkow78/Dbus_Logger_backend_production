@@ -86,15 +86,19 @@ COUNTER_FILE = "logs/.cycle_counter"  # Persystentny licznik cykli
 INTERRUPTION_TIMEOUT = 5.0        # Timeout przerwania połączenia (s)
 TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S.%f"  # Format timestampu (ms)
 APP_LOG_RETENTION_DAYS = 1        # Rotacja logów aplikacyjnych
+LOGS_RETENTION_DAYS = 1           # Rotacja logów cykli (logs/)
 ```
 
-#### 4️⃣ Konfiguracja UART
+- Usuwa logi aplikacyjne starsze niż `APP_LOG_RETENTION_DAYS`
+- Usuwa logi cykli starsze niż `LOGS_RETENTION_DAYS`
 ```python
 DEFAULT_BAUDRATE = 9600
+    - Auto-cleanup po `LOGS_RETENTION_DAYS` (logs/)
 DEFAULT_BYTESIZE = 8
 DEFAULT_PARITY = 'N'    # N=None, E=Even, O=Odd
 DEFAULT_STOPBITS = 1
 DEFAULT_TIMEOUT = 1.0   # sekundy
+    - Auto-cleanup po `LOGS_RETENTION_DAYS`
 ```
 
 **Auto-detekcja systemu:**

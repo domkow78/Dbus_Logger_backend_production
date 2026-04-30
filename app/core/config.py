@@ -96,7 +96,7 @@ CURRENT_OS = detect_os()
 # Domyślne porty szeregowe dla różnych systemów
 DEFAULT_PORTS = {
     'windows': 'COM5',
-    'linux': '/dev/ttyUSB0',      # Raspberry Pi, adapter USB
+    'linux': '/dev/serial0',      # Raspberry Pi UART (zgodnie z symlinkiem)
     'unknown': 'COM1'
 }
 

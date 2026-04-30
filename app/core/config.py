@@ -64,9 +64,9 @@ RECONNECT_MAX_DELAY = 30.0        # Maksymalne opóźnienie między próbami (se
 TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S.%f"  # używamy [:-3] dla milisekund
 
 # Rotacja logów aplikacyjnych (dni)
-APP_LOG_RETENTION_DAYS = 1
+APP_LOG_RETENTION_DAYS = 30
 # Rotacja logów cykli (logs/) (dni)
-LOGS_RETENTION_DAYS = 7  # domyślnie 7 dni, zmień wg potrzeb
+LOGS_RETENTION_DAYS = 30  # domyślnie 7 dni, zmień wg potrzeb
 
 # ==============================================================================
 # KONFIGURACJA UART

@@ -373,10 +373,18 @@ async def health_check():
             "reconnect_attempts": 0
         }
     
+    # Uptime systemu operacyjnego (czas od rozruchu)
+    try:
+        with open("/proc/uptime", "r") as f:
+            system_uptime_seconds = round(float(f.read().split()[0]), 2)
+    except Exception:
+        # Fallback dla Windows lub gdy /proc/uptime niedostępne
+        system_uptime_seconds = round(time.time() - start_time, 2) if start_time > 0 else 0
+
     # Status ApplicationService
     service_status = {
         "running": app_service.is_running() if app_service else False,
-        "uptime_seconds": round(time.time() - start_time, 2) if start_time > 0 else 0,
+        "uptime_seconds": system_uptime_seconds,
         "cycles_total": app_service.cycle_counter.get_current() if app_service else 0,
         "in_cycle": app_service.is_in_cycle() if app_service else False
     }

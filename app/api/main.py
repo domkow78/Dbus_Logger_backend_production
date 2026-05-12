@@ -1,5 +1,5 @@
 """
-Dbus Logger - Main Application
+UART Logger - Main Application
 Łączy core logic (ApplicationService) z REST API (FastAPI)
 """
 
@@ -18,9 +18,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import serial
 
-from app.core import config
-from app.core.uart import ConnectionManager
-from app.core.core_app import ApplicationService
+from my_project.core import config
+from my_project.core.uart import ConnectionManager
+from my_project.core.core_app import ApplicationService
 
 # Logging setup
 logging.basicConfig(
@@ -62,7 +62,7 @@ def initialize_uart_and_service():
         RuntimeError: Jeśli nie można otworzyć portu
     """
     logger.info("="*70)
-    logger.info("INICJALIZACJA DBUS LOGGER")
+    logger.info("INICJALIZACJA UART LOGGER")
     logger.info("="*70)
     
     logger.info(f"System: {config.CURRENT_OS.upper()}")
@@ -181,8 +181,8 @@ async def lifespan(app: FastAPI):
 # =============================================================================
 
 app = FastAPI(
-    title="Dbus Logger API",
-    description="REST API dla aplikacji do logowania komunikacji Dbus z detekcją cykli",
+    title="UART Logger API",
+    description="REST API dla aplikacji do logowania komunikacji UART z detekcją cykli",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -209,7 +209,7 @@ async def root():
     return """
     <html>
         <head>
-            <title>Dbus Logger API</title>
+            <title>UART Logger API</title>
             <style>
                 body { 
                     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -273,7 +273,7 @@ async def root():
         </head>
         <body>
             <div class="container">
-                <h1>🔌 Dbus Logger API</h1>
+                <h1>🔌 UART Logger API</h1>
                 <p><strong>Version:</strong> 1.0.0</p>
                 <p><strong>Status:</strong> <span class="status">✓ Running</span></p>
                 
@@ -313,10 +313,10 @@ async def api_info():
     API Information endpoint (JSON)
     """
     return {
-        "name": "Dbus Logger API",
+        "name": "UART Logger API",
         "version": "1.0.0",
         "status": "running",
-        "description": "REST API dla monitoringu i kontroli aplikacji Dbus Logger",
+        "description": "REST API dla monitoringu i kontroli aplikacji UART Logger",
         "gui": {
             "type": "NiceGUI",
             "note": "Run separately: python gui_nicegui.py (port 8080)"
@@ -473,13 +473,20 @@ async def list_logs():
     }
 
 
+from fastapi import Query
+
 @app.get("/logs/{filename}")
-async def get_log_content(filename: str):
+async def get_log_content(
+    filename: str,
+    head: Optional[int] = Query(None, description="Ile linii z początku pliku"),
+    tail: Optional[int] = Query(None, description="Ile linii z końca pliku")
+):
     """
     Zwraca zawartość konkretnego pliku logu (jako JSON).
-    
     Parametry:
     - filename: Nazwa pliku (np. cycle_0001_2026-02-09_14-20-51.txt)
+    - head: Ile linii z początku pliku (opcjonalnie)
+    - tail: Ile linii z końca pliku (opcjonalnie)
     
     Bezpieczeństwo:
     - Akceptowane tylko pliki pasujące do wzorca cycle_*.txt
@@ -491,44 +498,44 @@ async def get_log_content(filename: str):
             status_code=400,
             detail=f"Invalid filename format. Expected: cycle_*.txt, got: {filename}"
         )
-    
     # Dodatkowa ochrona przed path traversal
     if '..' in filename or '/' in filename or '\\' in filename:
         raise HTTPException(
             status_code=400,
             detail="Invalid filename: path traversal detected"
         )
-    
     filepath = Path(config.LOGS_DIR) / filename
-    
     if not filepath.exists():
         raise HTTPException(
             status_code=404,
             detail=f"Log file not found: {filename}"
         )
-    
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
             lines = f.readlines()
-        
-        # Usuń znaki nowej linii z każdej linii
         lines = [line.rstrip('\n\r') for line in lines]
-        
-        # Policz ramki (linie zaczynające się od timestampu)
-        frames_count = sum(1 for line in lines if line and not line.startswith(' '))
-        
-        # Parsuj cycle number z nazwy pliku (cycle_0087_...)
+        total_lines = len(lines)
+        # Pobierz fragmenty zgodnie z parametrami head/tail
+        selected_lines = []
+        if head is not None and tail is not None:
+            selected_lines = lines[:head] + (["..."] if total_lines > head + tail else []) + (lines[-tail:] if tail > 0 else [])
+        elif head is not None:
+            selected_lines = lines[:head]
+        elif tail is not None:
+            selected_lines = lines[-tail:]
+        else:
+            selected_lines = lines
+        frames_count = sum(1 for line in selected_lines if line and not line.startswith(' '))
         cycle_match = re.match(r'cycle_(\d+)_', filename)
         cycle_number = int(cycle_match.group(1)) if cycle_match else 0
-        
         return {
             "filename": filename,
             "cycle_number": cycle_number,
-            "lines": lines,
+            "lines": selected_lines,
             "frames_count": frames_count,
-            "size_bytes": filepath.stat().st_size
+            "size_bytes": filepath.stat().st_size,
+            "total_lines": total_lines
         }
-    
     except Exception as e:
         logger.error(f"Error reading log file {filename}: {e}")
         raise HTTPException(
@@ -674,7 +681,7 @@ if __name__ == "__main__":
     import uvicorn
     
     print("\n" + "="*70)
-    print("DBUS LOGGER - Production API")
+    print("UART LOGGER - Production API")
     print("="*70)
     print(f"API będzie dostępne na: http://localhost:8000")
     print(f"Dokumentacja API: http://localhost:8000/docs")

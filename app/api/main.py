@@ -18,9 +18,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import serial
 
-from my_project.core import config
-from my_project.core.uart import ConnectionManager
-from my_project.core.core_app import ApplicationService
+from app.core import config
+from app.core.uart import ConnectionManager
+from app.core.core_app import ApplicationService
 
 # Logging setup
 logging.basicConfig(

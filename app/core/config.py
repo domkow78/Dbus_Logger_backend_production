@@ -5,6 +5,36 @@ Konfiguracja aplikacji do logowania komunikacji UART.
 import os
 import socket
 
+
+def get_env_bool(name: str, default: bool = False) -> bool:
+    """Odczyt bool ze zmiennej środowiskowej."""
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on", "y", "t"}
+
+
+def get_env_int(name: str, default: int) -> int:
+    """Odczyt int ze zmiennej środowiskowej (wspiera np. 0x3C)."""
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    try:
+        return int(raw, 0)
+    except ValueError:
+        return default
+
+
+def get_env_float(name: str, default: float) -> float:
+    """Odczyt float ze zmiennej środowiskowej."""
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    try:
+        return float(raw)
+    except ValueError:
+        return default
+
 # Detekcja cykli: CMD + DATA
 # START: CMD=1001 (0x1001), DATA=01 00
 # END:   CMD=1001 (0x1001), DATA=03 00
@@ -67,6 +97,18 @@ TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S.%f"  # używamy [:-3] dla milisekund
 APP_LOG_RETENTION_DAYS = 30
 # Rotacja logów cykli (logs/) (dni)
 LOGS_RETENTION_DAYS = 30  # domyślnie 7 dni, zmień wg potrzeb
+
+
+# ============================================================================
+# KONFIGURACJA OLED (SSD1306 128x32, I2C)
+# ============================================================================
+
+OLED_ENABLED = get_env_bool("OLED_ENABLED", False)
+OLED_I2C_BUS = get_env_int("OLED_I2C_BUS", 1)
+OLED_I2C_ADDR = get_env_int("OLED_I2C_ADDR", 0x3C)
+OLED_UPDATE_SEC = get_env_float("OLED_UPDATE_SEC", 1.0)
+OLED_WIDTH = 128
+OLED_HEIGHT = 32
 
 # ==============================================================================
 # KONFIGURACJA UART

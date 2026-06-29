@@ -8,8 +8,13 @@ services:
     environment:
       - STATION_ID=${STATION_ID:-stanowisko-01}
       - TZ=Europe/Warsaw
+      - OLED_ENABLED=1
+      - OLED_I2C_BUS=1
+      - OLED_I2C_ADDR=0x3C
+      - OLED_UPDATE_SEC=1.0
     volumes:
       - ./logs:/app/logs
       - ./app_logs:/app/app_logs
     devices:
       - /dev/serial0:/dev/serial0
+      - /dev/i2c-1:/dev/i2c-1

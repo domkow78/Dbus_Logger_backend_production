@@ -185,7 +185,7 @@ docker run --rm hello-world
 
 Projekt zawiera gotowy plik [docker-compose.yml](docker-compose.yml), który konfiguruje kontener razem z urządzeniem szeregowym, portami i wolumenami.
 
-### 5.1 Domyślna konfiguracja
+### 5.1 Domyślna konfiguracja (UART + OLED I2C)
 
 ```yaml
 services:
@@ -195,6 +195,7 @@ services:
     restart: unless-stopped
     devices:
       - /dev/serial0:/dev/serial0    # GPIO UART (zalecane)
+      - /dev/i2c-1:/dev/i2c-1        # OLED SSD1306 (I2C)
       # - /dev/ttyUSB0:/dev/ttyUSB0  # Adapter USB (alternatywnie)
     ports:
       - "8000:8000"
@@ -203,6 +204,11 @@ services:
       - ./app_logs:/app/app_logs
     environment:
       - STATION_ID=${STATION_ID:-raspberrypi}
+      - TZ=Europe/Warsaw
+      - OLED_ENABLED=1
+      - OLED_I2C_BUS=1
+      - OLED_I2C_ADDR=0x3C
+      - OLED_UPDATE_SEC=1.0
 ```
 
 ### 5.2 Konfiguracja dla adaptera USB
@@ -235,6 +241,22 @@ STATION_ID=stanowisko-02
 Lub przez zmienną przy uruchomieniu:
 ```bash
 STATION_ID=stanowisko-02 docker compose up -d
+```
+
+### 5.4 OLED SSD1306 (I2C) - wymagania
+
+Przed uruchomieniem kontenera upewnij się, że I2C jest aktywne na Raspberry Pi i istnieje urządzenie `/dev/i2c-1`.
+
+Szybka weryfikacja:
+```bash
+ls -la /dev/i2c-1
+```
+
+Jeśli plik nie istnieje, włącz I2C w `raspi-config`:
+```bash
+sudo raspi-config
+# Interface Options -> I2C -> Enable
+sudo reboot
 ```
 
 ---

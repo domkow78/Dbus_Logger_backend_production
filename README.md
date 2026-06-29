@@ -285,9 +285,9 @@ docker build -t dbus-logger-backend .
 # Uruchomienie z dostępem do portu szeregowego
 docker run -d \
   --name dbus-logger \
+  --network host \
   --device /dev/serial0:/dev/serial0 \
   --device /dev/i2c-1:/dev/i2c-1 \
-  -p 8000:8000 \
   -e STATION_ID=stanowisko-01 \
   -e TZ=Europe/Warsaw \
   -e OLED_ENABLED=1 \

@@ -3,8 +3,8 @@ services:
     build: .
     container_name: dbus-logger
     restart: unless-stopped
-    ports:
-      - "8000:8000"
+    # Dla poprawnego IP na OLED używamy sieci hosta (Raspberry Pi LAN IP)
+    network_mode: host
     environment:
       - STATION_ID=${STATION_ID:-stanowisko-01}
       - TZ=Europe/Warsaw

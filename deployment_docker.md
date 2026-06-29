@@ -193,12 +193,11 @@ services:
     build: .
     container_name: dbus-logger
     restart: unless-stopped
+    network_mode: host
     devices:
       - /dev/serial0:/dev/serial0    # GPIO UART (zalecane)
       - /dev/i2c-1:/dev/i2c-1        # OLED SSD1306 (I2C)
       # - /dev/ttyUSB0:/dev/ttyUSB0  # Adapter USB (alternatywnie)
-    ports:
-      - "8000:8000"
     volumes:
       - ./logs:/app/logs
       - ./app_logs:/app/app_logs
@@ -210,6 +209,8 @@ services:
       - OLED_I2C_ADDR=0x3C
       - OLED_UPDATE_SEC=1.0
 ```
+
+    > Uwaga: `network_mode: host` sprawia, że backend i OLED używają IP hosta (Raspberry Pi), a nie adresu kontenera.
 
 ### 5.2 Konfiguracja dla adaptera USB
 

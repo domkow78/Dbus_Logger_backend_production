@@ -98,7 +98,7 @@ class OledDisplayService:
             ip = config.get_local_ip()
             station_id = config.get_station_id()
             hhmm = datetime.now().strftime("%H:%M")
-            line2 = f"{hhmm} {station_id}"
+            line2 = f"{hhmm}     {station_id}"
             self._render(ip, line2)
             self._stop_event.wait(self.update_sec)
 

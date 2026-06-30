@@ -6,7 +6,7 @@ services:
     # Dla poprawnego IP na OLED używamy sieci hosta (Raspberry Pi LAN IP)
     network_mode: host
     environment:
-      - STATION_ID=${STATION_ID:-stanowisko-01}
+      - STATION_ID=${STATION_ID:-raspberrypi}
       - TZ=Europe/Warsaw
       - OLED_ENABLED=1
       - OLED_I2C_BUS=1

@@ -3,7 +3,7 @@ Minimalny serwis OLED SSD1306 (I2C) dla Raspberry Pi.
 
 Wyświetlanie:
 - Linia 1: pełny adres IP
-- Linia 2: czas HH:MM
+- Linia 2: czas HH:MM + spacja + nazwa stanowiska/hosta
 """
 
 import logging
@@ -96,8 +96,10 @@ class OledDisplayService:
     def _run_loop(self):
         while not self._stop_event.is_set():
             ip = config.get_local_ip()
+            station_id = config.get_station_id()
             hhmm = datetime.now().strftime("%H:%M")
-            self._render(ip, hhmm)
+            line2 = f"{hhmm} {station_id}"
+            self._render(ip, line2)
             self._stop_event.wait(self.update_sec)
 
     def _render(self, ip: str, hhmm: str):

@@ -285,10 +285,15 @@ docker build -t dbus-logger-backend .
 # Uruchomienie z dostępem do portu szeregowego
 docker run -d \
   --name dbus-logger \
+  --network host \
   --device /dev/serial0:/dev/serial0 \
-  -p 8000:8000 \
+  --device /dev/i2c-1:/dev/i2c-1 \
   -e STATION_ID=stanowisko-01 \
   -e TZ=Europe/Warsaw \
+  -e OLED_ENABLED=1 \
+  -e OLED_I2C_BUS=1 \
+  -e OLED_I2C_ADDR=0x3C \
+  -e OLED_UPDATE_SEC=1.0 \
   -v $(pwd)/logs:/app/logs \
   dbus-logger-backend
 ```
@@ -300,6 +305,10 @@ docker run -d \
 | Zmienna      | Domyślna             | Opis                                                   |
 |--------------|----------------------|--------------------------------------------------------|
 | `STATION_ID` | hostname maszyny     | Identyfikator stanowiska widoczny w `/health`          |
+| `OLED_ENABLED` | `0`                | Włącza wyświetlanie na OLED SSD1306 (`1` = włączone)  |
+| `OLED_I2C_BUS` | `1`                | Magistrala I2C (Raspberry Pi: zwykle `1`)             |
+| `OLED_I2C_ADDR` | `0x3C`            | Adres urządzenia OLED na I2C                           |
+| `OLED_UPDATE_SEC` | `1.0`           | Interwał odświeżania ekranu (sekundy)                 |
 
 ---
 
@@ -313,6 +322,9 @@ docker run -d \
 | `crcmod`        | Obliczanie CRC16 XModem dla ramek UART    |
 | `websockets`    | Wsparcie WebSocket (uvicorn[standard])    |
 | `requests`      | Klient HTTP (testy/integracja)            |
+| `luma.oled`     | Sterownik OLED SSD1306 (I2C)              |
+| `smbus2`        | Obsługa magistrali I2C w Python           |
+| `Pillow`        | Renderowanie tekstu na ekran OLED         |
 | `pytest`        | Testy jednostkowe                         |
 | `pytest-cov`    | Pokrycie testami                          |
 | `zeroconf`      | *(opcjonalny)* Auto-discovery mDNS w LAN |

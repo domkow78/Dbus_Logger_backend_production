@@ -3,13 +3,18 @@ services:
     build: .
     container_name: dbus-logger
     restart: unless-stopped
-    ports:
-      - "8000:8000"
+    # Dla poprawnego IP na OLED używamy sieci hosta (Raspberry Pi LAN IP)
+    network_mode: host
     environment:
       - STATION_ID=${STATION_ID:-stanowisko-01}
       - TZ=Europe/Warsaw
+      - OLED_ENABLED=1
+      - OLED_I2C_BUS=1
+      - OLED_I2C_ADDR=0x3C
+      - OLED_UPDATE_SEC=1.0
     volumes:
       - ./logs:/app/logs
       - ./app_logs:/app/app_logs
     devices:
       - /dev/serial0:/dev/serial0
+      - /dev/i2c-1:/dev/i2c-1

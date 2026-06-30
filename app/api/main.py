@@ -21,6 +21,7 @@ import serial
 from app.core import config
 from app.core.uart import ConnectionManager
 from app.core.core_app import ApplicationService
+from app.core.oled_display import OledDisplayService
 
 # Logging setup
 logging.basicConfig(
@@ -32,6 +33,7 @@ logger = logging.getLogger(__name__)
 # Global instances
 connection_manager: Optional[ConnectionManager] = None
 app_service: Optional[ApplicationService] = None
+oled_service: Optional[OledDisplayService] = None
 start_time: float = 0.0  # Track application start time
 
 
@@ -133,7 +135,7 @@ async def lifespan(app: FastAPI):
     Startup: inicjalizacja UART i service
     Shutdown: zamknięcie połączeń
     """
-    global connection_manager, app_service, start_time
+    global connection_manager, app_service, oled_service, start_time
     
     # STARTUP
     logger.info("Starting FastAPI application...")
@@ -141,6 +143,16 @@ async def lifespan(app: FastAPI):
     
     try:
         connection_manager, app_service = initialize_uart_and_service()
+
+        oled_service = OledDisplayService(
+            enabled=config.OLED_ENABLED,
+            i2c_bus=config.OLED_I2C_BUS,
+            i2c_addr=config.OLED_I2C_ADDR,
+            width=config.OLED_WIDTH,
+            height=config.OLED_HEIGHT,
+            update_sec=config.OLED_UPDATE_SEC,
+        )
+        oled_service.start()
     except Exception as e:
         logger.critical(f"Failed to initialize: {e}")
         raise
@@ -154,6 +166,14 @@ async def lifespan(app: FastAPI):
     logger.info("="*70)
     logger.info("SHUTDOWN - Zamykanie aplikacji...")
     logger.info("="*70)
+
+    if oled_service:
+        try:
+            logger.info("Zatrzymywanie OLED Service...")
+            oled_service.stop()
+            logger.info("✓ OLED Service zatrzymany")
+        except Exception as e:
+            logger.error(f"Błąd podczas zatrzymywania OLED: {e}")
     
     if app_service:
         try:
